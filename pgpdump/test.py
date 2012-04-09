@@ -1,8 +1,16 @@
+#!/usr/bin/env python
+
 import base64
 from datetime import datetime
 from itertools import repeat
 import os.path
+import sys
 from unittest import main, TestCase
+
+# Prepend the parent directory of this file to the PYTHONPATH,
+# to use this very module and not a system wide installed one
+ROOTDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, ROOTDIR)
 
 from pgpdump import AsciiData, BinaryData
 from pgpdump.packet import (TAG_TYPES, SignaturePacket, PublicKeyPacket,
@@ -427,6 +435,11 @@ class PacketTestCase(TestCase):
         for expected, invals in data:
             self.assertEqual(expected, new_tag_length(invals, 0))
 
-
 if __name__ == '__main__':
+    print("""The recommended way of invocation is
+        python2 -m unittest pgpdump.test""")
+    print("We have, however, added %s to the PYTHONPATH. Please review "
+        "your PYTHONPATH which currently is:" % ROOTDIR)
+    print(sys.path)
+    
     main()
