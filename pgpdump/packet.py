@@ -160,7 +160,9 @@ class SignaturePacket(Packet, AlgoLookup):
 
             # "hash material" byte must be 0x05
             if self.data[offset] != 0x05:
-                raise PgpdumpException("Invalid v3 signature packet")
+                raise PgpdumpException("Invalid v3 signature packet. "
+                    "Expected data at offset %d to be 0x05, but it is "
+                    "%02x" % (offset, data[offset]))
             offset += 1
 
             self.raw_sig_type = self.data[offset]
@@ -345,8 +347,9 @@ class PublicKeyPacket(Packet, AlgoLookup):
                 md5.update(get_int_bytes(self.prime))
                 md5.update(get_int_bytes(self.group_gen))
             else:
-                raise PgpdumpException("Invalid non-RSA v%d public key" %
-                        self.pubkey_version)
+                raise PgpdumpException("Invalid non-RSA (%s) v%d public key" % (
+                        self.pub_algorithm_type, self.pubkey_version))
+
             self.fingerprint = md5.hexdigest().upper().encode('ascii')
         elif self.pubkey_version == 4:
             sha1 = hashlib.sha1()

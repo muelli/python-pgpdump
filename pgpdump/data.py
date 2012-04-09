@@ -11,15 +11,19 @@ class BinaryData(object):
 
     def __init__(self, data):
         if not data:
-            raise PgpdumpException("no data to parse")
+            raise PgpdumpException("no data to parse, "
+                "data is %s" % repr(data)[:25])
         if len(data) <= 1:
-            raise PgpdumpException("data too short")
+            raise PgpdumpException("data too short: len=%d" % len(data))
 
         data = bytearray(data)
 
         # 7th bit of the first byte must be a 1
-        if not bool(data[0] & self.binary_tag_flag):
-            raise PgpdumpException("incorrect binary data")
+        binary_tag = bool(data[0] & self.binary_tag_flag)
+        if not binary_tag:
+            raise PgpdumpException("incorrect binary data. expected 7th bit "
+                "in first byte (%02x) to be 1, not %d."  % (
+                data[0], binary_tag))
         self.data = data
         self.length = len(data)
 
@@ -75,8 +79,9 @@ class AsciiData(BinaryData):
             if nl_idx < 0:
                 nl_idx = data.find(b'\r\n\r\n', idx)
             if nl_idx < 0:
-                raise PgpdumpException(
-                        "found magic, could not find start of data")
+                raise PgpdumpException("found magic, could not find start "
+                    "of data. Expected two newlines "
+                    r"(\r\n\r\n or \n\n)")
             # now find the end of the data.
             end_idx = data.find(b'-----', nl_idx)
             if end_idx:
