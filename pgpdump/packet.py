@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import hashlib
+from math import ceil, log
 import re
 from warnings import warn
 
@@ -305,6 +306,7 @@ class PublicKeyPacket(Packet, AlgoLookup):
         self.raw_pub_algorithm = None
         self.pub_algorithm_type = None
         self.modulus = None
+        self.modulus_bitlen = None
         self.exponent = None
         self.prime = None
         self.group_order = None
@@ -378,6 +380,8 @@ class PublicKeyPacket(Packet, AlgoLookup):
             # n, e
             self.modulus, offset = get_mpi(self.data, offset)
             self.exponent, offset = get_mpi(self.data, offset)
+            # the length of the modulus in bits
+            self.modulus_bitlen = int(ceil(log(self.modulus, 2)))
         elif self.raw_pub_algorithm == 17:
             self.pub_algorithm_type = "dsa"
             # p, q, g, y
