@@ -163,7 +163,7 @@ class SignaturePacket(Packet, AlgoLookup):
             if self.data[offset] != 0x05:
                 raise PgpdumpException("Invalid v3 signature packet. "
                     "Expected data at offset %d to be 0x05, but it is "
-                    "%02x" % (offset, data[offset]))
+                    "%02x" % (offset, self.data[offset]))
             offset += 1
 
             self.raw_sig_type = self.data[offset]
